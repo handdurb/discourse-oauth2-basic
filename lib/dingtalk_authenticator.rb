@@ -26,8 +26,8 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
                             "Accept" => "application/json"
                           },
                           body: {
-                            clientId: SiteSetting.dingtalk_app_key,
-                            clientSecret: SiteSetting.dingtalk_app_secret,
+                            clientId: SiteSetting.oauth2_client_id,
+                            clientSecret: SiteSetting.oauth2_client_secret,
                             code: env["rack.request.query_hash"]["code"],
                             grantType: "authorization_code"
                           }.to_json
