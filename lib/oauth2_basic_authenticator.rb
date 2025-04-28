@@ -50,8 +50,15 @@ class OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
                             opts[:client_options][:auth_scheme] = :request_body
                             opts[:token_params] = {
                               headers: {
-                                "Authorization" => basic_auth_header,
+                                "Content-Type" => "application/json",
+                                "Accept" => "application/json"
                               },
+                              body: {
+                                clientId: opts[:client_id],
+                                clientSecret: opts[:client_secret],
+                                code: env["rack.request.query_hash"]["code"],
+                                grantType: "authorization_code"
+                              }.to_json
                             }
                           elsif SiteSetting.oauth2_send_auth_header?
                             opts[:client_options][:auth_scheme] = :basic_auth

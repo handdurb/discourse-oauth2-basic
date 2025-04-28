@@ -3,30 +3,7 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
   def name
     "dingtalk"
   end
-  def register_middleware(omniauth)
-    omniauth.provider :oauth2_basic,
-                      name: name,
-                      setup: lambda { |env|
-                        opts = env["omniauth.strategy"].options
-                        # 钉钉专用配置
-                        opts[:client_options] = {
-                          token_url: "https://api.dingtalk.com/v1.0/oauth2/userAccessToken",
-                          auth_scheme: :request_body
-                        }
-                        opts[:token_params] = {
-                          headers: {
-                            "Content-Type" => "application/json",
-                            "Accept" => "application/json"
-                          },
-                          body: {
-                            clientId: SiteSetting.oauth2_client_id,
-                            clientSecret: SiteSetting.oauth2_client_secret,
-                            code: env["rack.request.query_hash"]["code"],
-                            grantType: "authorization_code"
-                          }.to_json
-                        }
-                      }
-  end
+
   # 核心认证流程
   def after_authenticate(auth, existing_account: nil)
     log "[钉钉] 开始认证流程"
