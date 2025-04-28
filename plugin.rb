@@ -12,6 +12,7 @@ enabled_site_setting :oauth2_enabled
 require_relative "lib/omniauth/strategies/oauth2_basic"
 require_relative "lib/oauth2_faraday_formatter"
 require_relative "lib/oauth2_basic_authenticator"
+require_relative "lib/dingtalk_authenticator.rb"
 
 # You should use this register if you want to add custom paths to traverse the user details JSON.
 # We'll store the value in the user associated account's extra attribute hash using the full path as the key.
@@ -32,6 +33,5 @@ DiscoursePluginRegistry.define_filtered_register :oauth2_basic_required_json_pat
 auth_provider title_setting: "oauth2_button_title", authenticator: OAuth2BasicAuthenticator.new
 
 require_relative "lib/validators/oauth2_basic/oauth2_fetch_user_details_validator"
-
 
 auth_ding_provider authenticator: DingtalkAuthenticator.new
