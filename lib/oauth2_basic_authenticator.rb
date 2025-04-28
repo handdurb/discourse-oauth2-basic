@@ -19,13 +19,16 @@ class OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
                       setup:
                         lambda { |env|
                           opts = env["omniauth.strategy"].options
-                          opts[:client_id] = SiteSetting.oauth2_client_id
-                          opts[:client_secret] = SiteSetting.oauth2_client_secret
+                          opts[:clientId] = SiteSetting.oauth2_client_id
+                          opts[:clientSecret] = SiteSetting.oauth2_client_secret
                           opts[:provider_ignores_state] = SiteSetting.oauth2_disable_csrf
                           opts[:client_options] = {
                             authorize_url: SiteSetting.oauth2_authorize_url,
                             token_url: SiteSetting.oauth2_token_url,
                             token_method: SiteSetting.oauth2_token_url_method.downcase.to_sym,
+                            authorize_params: {
+                              prompt: "consent" # 强制要求用户授权时显示权限确认界面
+                            }
                           }
                           opts[:authorize_options] = SiteSetting
                             .oauth2_authorize_options
