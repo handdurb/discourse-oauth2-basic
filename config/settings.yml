@@ -43,7 +43,7 @@ login:
   oauth2_authorize_options:
     default: "scope"
     type: list
-  scope: ""
+  oauth2_scope: ""
   oauth2_json_unionid_path: "unionid"
   oauth2_button_title:
     default: "with OAuth2"
