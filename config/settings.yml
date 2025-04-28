@@ -56,3 +56,6 @@ login:
   oauth2_email_domain:
     default: "tmp.renogy.com"
     client: true
+  dingtalk_enable_cache:
+    default: false
+    client: true
