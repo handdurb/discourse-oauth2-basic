@@ -4,30 +4,27 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
     "dingtalk"
   end
 
-  # 重要：继承时保留父类配置
-  def register_middleware(omniauth)
-    super # 先执行父类基础配置
 
+  def register_middleware(omniauth)
     omniauth.provider :oauth2_basic,
                       name: name,
                       setup: lambda { |env|
                         opts = env["omniauth.strategy"].options
 
-                        # 覆盖钉钉专用配置
+                        # 强制使用钉钉参数命名规范
                         opts[:client_options] = {
-                          site: "https://api.dingtalk.com",
-                          token_url: "/v1.0/oauth2/userAccessToken",
+                          token_url: "https://api.dingtalk.com/v1.0/oauth2/userAccessToken",
                           auth_scheme: :request_body
                         }
 
                         opts[:token_params] = {
                           headers: {
                             "Content-Type" => "application/json",
-                            "Accept" => "application/json"
+                            "X-Dingtalk-Isv" => "true" # 企业应用必须的头部
                           },
                           body: {
-                            clientId: SiteSetting.oauth2_client_id,
-                            clientSecret: SiteSetting.oauth2_client_secret,
+                            clientId: SiteSetting.dingtalk_app_key,
+                            clientSecret: SiteSetting.dingtalk_app_secret,
                             code: env["rack.request.query_hash"]["code"],
                             grantType: "authorization_code"
                           }.to_json

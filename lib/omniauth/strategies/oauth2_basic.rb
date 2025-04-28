@@ -8,36 +8,36 @@ class OmniAuth::Strategies::Oauth2Basic < ::OmniAuth::Strategies::OAuth2
     parse: :json
   }
 
-  # 核心方法：钉钉Token获取
   def build_access_token
     verifier = request.params['code']
 
-    # 构造钉钉专用请求体
+    # 钉钉要求参数命名规范（驼峰式）
     raw_body = {
-      clientId: client.id,
+      clientId: client.id,       # 注意首字母大写
       clientSecret: client.secret,
       code: verifier,
       grantType: "authorization_code"
     }.to_json
 
-    # 发送自定义JSON请求
-    response = client.request(:post, client.token_url, body: raw_body) do |req|
-      req.headers.update(
+    # 强制JSON请求头和格式
+    response = client.request(:post, client.token_url, {
+      body: raw_body,
+      headers: {
         "Content-Type" => "application/json",
         "Accept" => "application/json"
-      )
-    end
-
-    # 手动解析钉钉响应并转换为标准OAuth2格式
-    token_data = JSON.parse(response.body).deep_symbolize_keys
-    ::OAuth2::AccessToken.from_hash(
-      client,
-      {
-        access_token: token_data[:accessToken], # 钉钉 -> 标准
-        refresh_token: token_data[:refreshToken], # 钉钉 -> 标准
-        expires_in: token_data[:expireIn], # 钉钉 -> 标准
-        token_type: "Bearer"
       }
+    })
+
+    # 调试日志（打印实际发送内容）
+    Rails.logger.info "钉钉Token请求体: #{raw_body}"
+    Rails.logger.info "钉钉Token响应: #{response.body}"
+
+    # 解析钉钉响应
+    token_data = JSON.parse(response.body)
+    ::OAuth2::AccessToken.new(
+      client,
+      token_data['accessToken'],
+      expires_in: token_data['expireIn']
     )
   end
 
