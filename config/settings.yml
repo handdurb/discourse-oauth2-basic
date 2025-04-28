@@ -4,6 +4,7 @@ login:
     client: true
   oauth2_client_id: ""
   oauth2_client_secret: ""
+  oauth2_client_corpid: ""
   oauth2_authorize_url: ""
   oauth2_authorize_signup_url: ""
   oauth2_token_url: ""
@@ -42,7 +43,8 @@ login:
   oauth2_authorize_options:
     default: "scope"
     type: list
-  oauth2_scope: ""
+  scope: ""
+  oauth2_json_unionid_path: "unionid"
   oauth2_button_title:
     default: "with OAuth2"
     client: true
@@ -51,3 +53,6 @@ login:
   oauth2_disable_csrf:
     default: false
     hidden: true
+  oauth2_email_domain:
+    default: "tmp.renogy.com"
+    client: true
