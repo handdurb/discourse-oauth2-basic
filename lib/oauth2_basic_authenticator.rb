@@ -70,6 +70,19 @@ class OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
                             opts[:scope] = SiteSetting.oauth2_scope
                           end
 
+                          opts[:token_params] = {
+                            headers: {
+                              "Content-Type" => "application/json",
+                              "Accept" => "application/json"
+                            },
+                            body: {
+                              clientId: opts[:client_id],
+                              clientSecret: opts[:client_secret],
+                              code: env["rack.request.query_hash"]["code"],
+                              grantType: "authorization_code"
+                            }.to_json
+                          }
+
                           opts[:client_options][:connection_build] = lambda do |builder|
                             if SiteSetting.oauth2_debug_auth && defined?(OAuth2FaradayFormatter)
                               builder.response :logger,
