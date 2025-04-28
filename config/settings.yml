@@ -55,7 +55,7 @@ login:
     default: false
   oauth2_disable_csrf:
     default: false
-    hidden: true
+    hidden: false
   oauth2_email_domain:
     default: "tmp.renogy.com"
     client: true
