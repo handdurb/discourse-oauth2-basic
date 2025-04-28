@@ -23,8 +23,8 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
                             "X-Dingtalk-Isv" => "true" # 企业应用必须的头部
                           },
                           body: {
-                            clientId: SiteSetting.dingtalk_app_key,
-                            clientSecret: SiteSetting.dingtalk_app_secret,
+                            clientId: SiteSetting.oauth2_client_id,
+                            clientSecret: SiteSetting.oauth2_client_secret,
                             code: env["rack.request.query_hash"]["code"],
                             grantType: "authorization_code"
                           }.to_json
