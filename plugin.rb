@@ -34,4 +34,4 @@ auth_provider title_setting: "oauth2_button_title", authenticator: OAuth2BasicAu
 
 require_relative "lib/validators/oauth2_basic/oauth2_fetch_user_details_validator"
 
-auth_ding_provider authenticator: DingtalkAuthenticator.new
+auth_provider authenticator: DingtalkAuthenticator.new
