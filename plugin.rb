@@ -32,3 +32,7 @@ DiscoursePluginRegistry.define_filtered_register :oauth2_basic_required_json_pat
 auth_provider title_setting: "oauth2_button_title", authenticator: OAuth2BasicAuthenticator.new
 
 require_relative "lib/validators/oauth2_basic/oauth2_fetch_user_details_validator"
+
+require_relative "lib/validators/oauth2_basic/dingtalk_authenticator"
+
+auth_provider authenticator: DingtalkAuthenticator.new
