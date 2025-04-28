@@ -34,6 +34,7 @@ zh_CN:
     oauth2_authorize_options: "授权时请求这些选项"
     oauth2_scope: "授权请求此范围时"
     oauth2_button_title: "OAuth2 按钮的文本"
+    oauth2_dingtalk_title: "dingtalk 按钮的文本"
     oauth2_allow_association_change: 允许用户从 OAuth2 提供商断开并重新连接他们的 Discourse 帐户
     oauth2_disable_csrf: "禁用 CSRF 检查"
     errors:

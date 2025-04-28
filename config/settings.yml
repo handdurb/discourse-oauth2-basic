@@ -48,6 +48,9 @@ login:
   oauth2_button_title:
     default: "with OAuth2"
     client: true
+  oauth2_dingtalk_title:
+    default: "with DingTalk"
+    client: true
   oauth2_allow_association_change:
     default: false
   oauth2_disable_csrf:
