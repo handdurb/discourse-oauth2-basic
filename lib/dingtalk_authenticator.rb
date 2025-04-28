@@ -11,21 +11,26 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
                       setup: lambda { |env|
                         opts = env["omniauth.strategy"].options
 
-                        # 强制使用钉钉参数命名规范
+                        # 强制使用钉钉参数命名
+                        opts[:client_id] = SiteSetting.oauth2_client_id # 使用独立配置项
+                        opts[:client_secret] = SiteSetting.oauth2_client_secret
+
                         opts[:client_options] = {
-                          token_url: "https://api.dingtalk.com/v1.0/oauth2/userAccessToken",
+                          site: "https://api.dingtalk.com",
+                          authorize_url: "/oauth2/auth",
+                          token_url: "/v1.0/oauth2/userAccessToken",
                           auth_scheme: :request_body
                         }
 
                         opts[:token_params] = {
                           headers: {
                             "Content-Type" => "application/json",
-                            "X-Dingtalk-Isv" => "true" # 企业应用必须的头部
+                            "X-Dingtalk-Isv" => "true"
                           },
                           body: {
-                            clientId: SiteSetting.oauth2_client_id,
-                            clientSecret: SiteSetting.oauth2_client_secret,
-                            code: env["rack.request.query_hash"]["code"],
+                            clientId: opts[:client_id], # 使用驼峰命名
+                            clientSecret: opts[:client_secret],
+                            code: env.dig("rack.request.query_hash", "code"), # 安全访问
                             grantType: "authorization_code"
                           }.to_json
                         }
@@ -34,6 +39,9 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
   # 核心认证流程
   def after_authenticate(auth, existing_account: nil)
     log "[钉钉] 开始认证流程"
+
+    # 确保 auth 参数存在且包含 code
+    return auth_failed("无效的认证参数") unless auth && auth[:code]
 
     # 1. 通过授权码获取用户访问令牌
     user_token = get_user_access_token(auth[:code])
@@ -82,15 +90,16 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
   def get_base_user_info(user_token)
     log "[HTTP] 获取基础用户信息"
 
+    return nil unless user_token
+
     response = Faraday.get(
       "https://api.dingtalk.com/v1.0/contact/users/me",
       nil,
-      {
-        "x-acs-dingtalk-access-token" => user_token
-      }
+      { "x-acs-dingtalk-access-token" => user_token }
     )
 
-    log_response(response, "基础信息")
+    return log_failure("请求失败: #{response.status}") unless response.success?
+
     JSON.parse(response.body) rescue nil
   end
 
@@ -181,14 +190,15 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
 
   # 解析用户详情
   def parse_details(data)
+    return {} unless data.is_a?(Hash)
+
     {
-      user_id: data["unionId"],
-      username: data["nick"] || data["name"],
-      name: data["name"],
+      user_id: data.dig("unionId"),
+      username: data["nick"] || data["name"] || "钉钉用户",
       email: data["email"] || "#{data['unionId']}@#{SiteSetting.oauth2_email_domain}",
       avatar: data["avatarUrl"],
       email_verified: data["email"].present?
-    }
+    }.compact
   end
 
   # 构建认证结果
