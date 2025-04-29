@@ -3,7 +3,6 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
 
 
   def register_middleware(omniauth)
-    super
     omniauth.provider :oauth2_basic,
                       name: name,
                       setup: lambda { |env|
