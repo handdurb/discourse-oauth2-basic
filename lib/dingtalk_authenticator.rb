@@ -1,8 +1,5 @@
 # dingtalk_authenticator.rb
 class DingtalkAuthenticator < OAuth2BasicAuthenticator
-  def name
-    "dingtalk"
-  end
 
 
   def register_middleware(omniauth)
@@ -12,40 +9,40 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
                       setup: lambda { |env|
                         opts = env["omniauth.strategy"].options
 
-                        # 强制启用 Faraday 日志中间件
-                        opts[:client_options][:connection_build] = lambda do |builder|
-                          if SiteSetting.oauth2_debug_auth
-                            builder.response :logger, Rails.logger, {
-                              bodies: true,
-                              formatter: OAuth2FaradayFormatter # 使用自定义格式化类
-                            }
-                          end
-                          builder.adapter FinalDestination::FaradayAdapter
-                        end
+                        # # 强制启用 Faraday 日志中间件
+                        # opts[:client_options][:connection_build] = lambda do |builder|
+                        #   if SiteSetting.oauth2_debug_auth
+                        #     builder.response :logger, Rails.logger, {
+                        #       bodies: true,
+                        #       formatter: OAuth2FaradayFormatter # 使用自定义格式化类
+                        #     }
+                        #   end
+                        #   builder.adapter FinalDestination::FaradayAdapter
+                        # end
 
                         # 强制使用钉钉参数命名
-                        # opts[:client_id] = SiteSetting.oauth2_client_id # 使用独立配置项
-                        # opts[:client_secret] = SiteSetting.oauth2_client_secret
-                        #
-                        # opts[:client_options] = {
-                        #   site: "https://api.dingtalk.com",
-                        #   authorize_url: "/oauth2/auth",
-                        #   token_url: "/v1.0/oauth2/userAccessToken",
-                        #   auth_scheme: :request_body
-                        # }
-                        #
-                        # opts[:token_params] = {
-                        #   headers: {
-                        #     "Content-Type" => "application/json",
-                        #     "X-Dingtalk-Isv" => "true"
-                        #   },
-                        #   body: {
-                        #     clientId: opts[:client_id], # 使用驼峰命名
-                        #     clientSecret: opts[:client_secret],
-                        #     code: env.dig("rack.request.query_hash", "code"), # 安全访问
-                        #     grantType: "authorization_code"
-                        #   }.to_json
-                        # }
+                        opts[:client_id] = SiteSetting.oauth2_client_id # 使用独立配置项
+                        opts[:client_secret] = SiteSetting.oauth2_client_secret
+
+                        opts[:client_options] = {
+                          site: "https://api.dingtalk.com",
+                          authorize_url: "/oauth2/auth",
+                          token_url: "/v1.0/oauth2/userAccessToken",
+                          auth_scheme: :request_body
+                        }
+
+                        opts[:token_params] = {
+                          headers: {
+                            "Content-Type" => "application/json",
+                            "X-Dingtalk-Isv" => "true"
+                          },
+                          body: {
+                            clientId: opts[:client_id], # 使用驼峰命名
+                            clientSecret: opts[:client_secret],
+                            code: env.dig("rack.request.query_hash", "code"), # 安全访问
+                            grantType: "authorization_code"
+                          }.to_json
+                        }
                       }
   end
   # 核心认证流程
