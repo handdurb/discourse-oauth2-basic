@@ -55,6 +55,7 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
     return auth_failed("基础信息获取失败") unless base_info
     unionid = base_info.dig("unionId")
 
+    log "[钉钉] after_authenticate: 获取详细用户信息"
     # 3. 获取详细用户信息
     user_details = fetch_user_details(unionid)
     return auth_failed("用户详情获取失败") unless user_details
@@ -132,6 +133,7 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
 
   # 企业API获取详细信息
   def fetch_corp_details(unionid)
+    log "[钉钉] fetch_corp_details"
     # 获取企业令牌
     corp_token = get_corp_access_token
     return log_failure("企业令牌获取失败") unless corp_token
