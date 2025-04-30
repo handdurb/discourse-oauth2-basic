@@ -178,6 +178,7 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
 
   # 通过unionid获取userid
   def get_userid(corp_token, unionid)
+    log "通过unionid获取userid 开始"
     response = Faraday.post(
       "https://api.dingtalk.com/v1.0/contact/users/unionId/get",
       { unionId: unionid }.to_json,
