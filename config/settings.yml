@@ -61,4 +61,3 @@ login:
     client: true
   dingtalk_enable_cache:
     default: false
-    client: true

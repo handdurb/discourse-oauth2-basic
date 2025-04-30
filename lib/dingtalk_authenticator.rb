@@ -163,7 +163,7 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
     Discourse.cache.fetch(cache_key, expires_in: 7100) do
       log "[缓存] 企业令牌缓存未命中，重新获取"
       response = Faraday.get(
-        "https://api.dingtalk.com/v1.0/oauth2/accessToken",
+        "https://oapi.dingtalk.com/gettoken",
         nil,
         {
           "appKey" => SiteSetting.oauth2_client_id,
