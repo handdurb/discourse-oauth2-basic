@@ -142,21 +142,24 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
     userid = get_userid(corp_token, unionid)
     return log_failure("UserID查询失败") unless userid
 
-    # 获取完整用户信息
+    # 获取完整用户信息（钉钉文档要求access_token作为查询参数，请求体包含userid）
+    url = "https://oapi.dingtalk.com/topapi/v2/user/get?access_token=#{corp_token}"
+
     response = Faraday.post(
-      "https://oapi.dingtalk.com/topapi/v2/user/get",
+      url,
       {
-        access_token: corp_token
-      },{
+        userid: userid,
+        language: "zh_CN"  # 根据需求添加语言参数
+      }.to_json,
+      {
         "Content-Type" => "application/json",
         "Accept" => "application/json"
       }
-
     )
 
     return log_failure("用户详情请求失败") unless response.success?
 
-    parse_details(JSON.parse(response.body))
+    parse_details(JSON.parse(response.body).dig("result"))  # 注意提取result字段
   end
 
   # 获取企业访问令牌（带缓存）
@@ -182,17 +185,21 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
   # 通过unionid获取userid
   def get_userid(corp_token, unionid)
     log "通过unionid获取userid 开始"
-    response = Faraday.post(
-      "https://api.dingtalk.com/v1.0/contact/users/unionId/get",
-      {
-        # "Content-Type" => "application/json",
-        access_token: corp_token
-      },
-      { unionId: unionid }.to_json,
 
+    # 钉钉文档要求：access_token作为查询参数，unionid在请求体中
+    url = "https://oapi.dingtalk.com/topapi/user/getbyunionid?access_token=#{corp_token}"
+
+    response = Faraday.post(
+      url,
+      { unionid: unionid }.to_json,
+      {
+        "Content-Type" => "application/json",
+        "Accept" => "application/json"
+      }
     )
 
-    JSON.parse(response.body).dig("result", "userId") rescue nil
+    # 解析响应
+    JSON.parse(response.body).dig("result", "userid") rescue nil
   end
 
   # 解析用户详情
