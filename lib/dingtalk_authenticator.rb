@@ -207,10 +207,10 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
     return {} unless data.is_a?(Hash)
 
     {
-      user_id: data.dig("unionid"),  # 修正为小写
-      username: data["name"] || "钉钉用户",  # 钉钉返回的字段是 name，不是 nick
+      user_id: data["unionid"] || data["unionId"],  # 兼容大小写
+      username: data["name"] || "钉钉用户",
       email: data["email"] || "#{data['unionid']}@#{SiteSetting.oauth2_email_domain}",
-      avatar: data["avatar"],
+      avatar: data["avatarUrl"] || data["avatar"],  # 钉钉可能返回 avatarUrl
       email_verified: data["email"].present?
     }.compact
   end
