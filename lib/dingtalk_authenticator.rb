@@ -164,16 +164,15 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
       log "[缓存] 企业令牌缓存未命中，重新获取"
       response = Faraday.get(
         "https://oapi.dingtalk.com/gettoken",
-        nil,
         {
-          "appKey" => SiteSetting.oauth2_client_id,
-          "appSecret" => SiteSetting.oauth2_client_secret
-        }
+          appkey: SiteSetting.oauth2_client_id,
+          appsecret: SiteSetting.oauth2_client_secret
+        },
+        {}
       )
 
-      # 添加调试日志，输出完整响应
       log_response(response, "企业令牌接口")
-      JSON.parse(response.body)["accessToken"] rescue nil
+      JSON.parse(response.body)["access_token"] rescue nil  # 注意字段名可能是 "access_token"
     end
   end
 
