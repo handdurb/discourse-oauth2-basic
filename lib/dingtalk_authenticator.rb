@@ -143,12 +143,15 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
     return log_failure("UserID查询失败") unless userid
 
     # 获取完整用户信息
-    response = Faraday.get(
-      "https://api.dingtalk.com/v1.0/contact/users/#{userid}",
-      nil,
+    response = Faraday.post(
+      "https://oapi.dingtalk.com/topapi/v2/user/get",
       {
-        "x-acs-dingtalk-access-token" => corp_token
+        access_token: corp_token
+      },{
+        "Content-Type" => "application/json",
+        "Accept" => "application/json"
       }
+
     )
 
     return log_failure("用户详情请求失败") unless response.success?
@@ -181,11 +184,12 @@ class DingtalkAuthenticator < OAuth2BasicAuthenticator
     log "通过unionid获取userid 开始"
     response = Faraday.post(
       "https://api.dingtalk.com/v1.0/contact/users/unionId/get",
-      { unionId: unionid }.to_json,
       {
-        "Content-Type" => "application/json",
-        "x-acs-dingtalk-access-token" => corp_token
-      }
+        # "Content-Type" => "application/json",
+        access_token: corp_token
+      },
+      { unionId: unionid }.to_json,
+
     )
 
     JSON.parse(response.body).dig("result", "userId") rescue nil
